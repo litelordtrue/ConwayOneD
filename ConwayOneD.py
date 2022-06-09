@@ -6,6 +6,7 @@ from turtle import update
 
 #class defining-------------------------------------
 max_pix = 20
+ruleset = {"radius": 1, "born": [1], "survive": [0, 1]}
 
 class pixel():
     def __init__(self, index, status):
@@ -15,8 +16,8 @@ class pixel():
         self.neighbors = 0
 
     def CalculateStatus(self):
-        statusToLeft = initial_array[(self.index) - 1].status
-        statusToRight = initial_array[((self.index) + 1) % max_pix].status
+        statusToLeft = [initial_array[(self.index) - i].status for i in range(1, ruleset['radius'] + 1)]
+        statusToRight = [initial_array[((self.index) + i) % max_pix].status for i in range(1, ruleset['radius'] + 1)]
 
         if self.index == 0:
             self.CalculateNeigbors(statusToRight)
@@ -28,6 +29,8 @@ class pixel():
         return self
     
     def CalculateNeigbors(self, neighbors):
+        print(neighbors)
+        neighbors = sum(neighbors)
         if self.status == 0:
             if (neighbors in ruleset['born']):
                 self.nextStatus = 1
@@ -59,7 +62,6 @@ def updateRuleset(password): # password is of form R*B**S** where the ** are any
 
 #main-------------------------------------------
 tracker = {"resolved": False, "ticker": 0}
-ruleset = {"radius": 1, "born": [1], "survive": [0, 1]}
 alternating_array = [pixel(x, x % 2) for x in range(0, max_pix + 1)]
 
 initial_array = [pixel(x, random.randint(0,1)) for x in range(0, max_pix + 1)]
@@ -68,7 +70,7 @@ display_array = [p.status for p in initial_array]
 
 print("initial state: {} \n".format(display_array))
 #updateRuleset(str(input("Would you like to change the ruleset? use R*B**S**: ")))
-
+#updateRuleset('R2B1S01')
 
 while tracker['resolved'] == False:
     tracker['ticker'] = tracker['ticker'] + 1
