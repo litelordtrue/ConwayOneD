@@ -6,7 +6,7 @@ from turtle import update
 
 #class defining-------------------------------------
 max_pix = 20
-ruleset = {"radius": 1, "born": [1], "survive": [0, 1]}
+ruleset = {}
 
 class pixel():
     def __init__(self, index, status):
@@ -16,20 +16,27 @@ class pixel():
         self.neighbors = 0
 
     def CalculateStatus(self):
-        statusToLeft = [initial_array[(self.index) - i].status for i in range(1, ruleset['radius'] + 1)]
-        statusToRight = [initial_array[((self.index) + i) % max_pix].status for i in range(1, ruleset['radius'] + 1)]
+        # this is really ugly, needs to be cleaned up
+        if self.index <= ruleset['radius'] - 1:
 
-        if self.index == 0:
-            self.CalculateNeigbors(statusToRight)
-        elif self.index == max_pix:
-            self.CalculateNeigbors(statusToLeft)
+            distance = abs(self.index)
+            statusToLeft = [initial_array[(self.index) - i].status for i in range(1, distance + 1)]
+
+            statusToRight = [initial_array[((self.index) + i)].status for i in range(1, ruleset['radius'] + 1)]
+        elif self.index >= max_pix - (ruleset['radius'] - 1):
+
+            statusToLeft = [initial_array[(self.index) - i].status for i in range(1, ruleset['radius'] + 1)]
+
+            distance = abs(self.index - max_pix)
+            statusToRight = [initial_array[((self.index) + i)].status for i in range(1, distance + 1)]
         else:
-            self.CalculateNeigbors(statusToLeft + statusToRight)
-        
+            statusToLeft = [initial_array[(self.index) - i].status for i in range(1, ruleset['radius'] + 1)]
+            statusToRight = [initial_array[((self.index) + i)].status for i in range(1, ruleset['radius'] + 1)]
+
+        self.CalculateNeigbors(statusToLeft + statusToRight)
         return self
     
     def CalculateNeigbors(self, neighbors):
-        print(neighbors)
         neighbors = sum(neighbors)
         if self.status == 0:
             if (neighbors in ruleset['born']):
@@ -47,7 +54,6 @@ class pixel():
         return self
 
 def updateRuleset(password): # password is of form R*B**S** where the ** are any number of neighbors. * is the radius to check in. 
-    print(ruleset)
     split_array = list(password)
     r = split_array.index('R')
     b = split_array.index('B')
@@ -56,21 +62,21 @@ def updateRuleset(password): # password is of form R*B**S** where the ** are any
     ruleset['radius'] = int(split_array[r + 1])
     ruleset['born'] = [int(x) for x in split_array[b + 1: s]]
     ruleset['survive'] = [int(x) for x in split_array [s + 1:]]
-    print(ruleset)
 
 
 
 #main-------------------------------------------
+updateRuleset("R1B1S01")
+
 tracker = {"resolved": False, "ticker": 0}
 alternating_array = [pixel(x, x % 2) for x in range(0, max_pix + 1)]
 
 initial_array = [pixel(x, random.randint(0,1)) for x in range(0, max_pix + 1)]
-#initial_array = alternating_array
+initial_array = alternating_array
 display_array = [p.status for p in initial_array]
 
 print("initial state: {} \n".format(display_array))
 #updateRuleset(str(input("Would you like to change the ruleset? use R*B**S**: ")))
-#updateRuleset('R2B1S01')
 
 while tracker['resolved'] == False:
     tracker['ticker'] = tracker['ticker'] + 1
