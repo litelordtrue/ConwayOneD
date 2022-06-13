@@ -58,7 +58,7 @@ class pixel():
     # However, it scales linearly with the number of possible neighbors
     # This is really bad for higher radius since that scales at 2x. 
     def id(self):
-        pass
+        self.nextStatus = self.status
 
     def trans(self):
         self.nextStatus = abs(1-self.status)
