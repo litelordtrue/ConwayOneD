@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 #importing ------------
 import random
-from turtle import update
 
 #class defining-------------------------------------
 max_pix = 20
@@ -38,6 +37,7 @@ class pixel():
     
     def CalculateNeigbors(self, neighbors):
         neighbors = sum(neighbors)
+        
         if self.status == 0:
             if (neighbors in ruleset['born']):
                 self.nextStatus = 1
@@ -53,6 +53,23 @@ class pixel():
         self.status = self.nextStatus
         return self
 
+
+    # this is an idea for how to represent rules. 
+    # However, it scales linearly with the number of possible neighbors
+    # This is really bad for higher radius since that scales at 2x. 
+    def id(self):
+        pass
+
+    def trans(self):
+        self.nextStatus = abs(1-self.status)
+
+    def f_zero(self):
+        self.nextStatus = 0
+
+    def f_one(self):
+        self.nextStatus = 1
+    #end
+    
 def updateRuleset(password): # password is of form R*B**S** where the ** are any number of neighbors. * is the radius to check in. 
     split_array = list(password)
     r = split_array.index('R')
@@ -62,17 +79,18 @@ def updateRuleset(password): # password is of form R*B**S** where the ** are any
     ruleset['radius'] = int(split_array[r + 1])
     ruleset['born'] = [int(x) for x in split_array[b + 1: s]]
     ruleset['survive'] = [int(x) for x in split_array [s + 1:]]
+    ruleset['equality'] = 1
 
 
 
 #main-------------------------------------------
-updateRuleset("R1B1S01")
+updateRuleset("R3B234S2356")
 
 tracker = {"resolved": False, "ticker": 0}
 alternating_array = [pixel(x, x % 2) for x in range(0, max_pix + 1)]
 
 initial_array = [pixel(x, random.randint(0,1)) for x in range(0, max_pix + 1)]
-initial_array = alternating_array
+#initial_array = alternating_array
 display_array = [p.status for p in initial_array]
 
 print("initial state: {} \n".format(display_array))
